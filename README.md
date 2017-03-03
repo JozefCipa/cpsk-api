@@ -1,14 +1,15 @@
-python-cpsk-api
+cpsk-api
 ===============
 
-Simple python api for grabbing data from cp.sk
+Forked from official [repo](https://github.com/Adman/python-cpsk-api)
 
-Installation
+- In progress
+
+Improvements
 ------------
-
-Available on [pypi](https://pypi.python.org/pypi/cpsk/)
-
-Running `$ pip install cpsk` will get the package installed
+ - PHP version, needed for my project
+ - parse also link numbers
+ - API to get link numbers for given stop
 
 
 *Beware that by using this you might be violating cp.sk ToS*
