@@ -2,6 +2,7 @@
 
 import requests
 import datetime
+import json
 from lxml import html
 
 import sys
@@ -22,19 +23,41 @@ class Line(object):
         self.vehicle = ''
         self.walk_duration = ''
         self.delay = ''
-        self.platform = ''
+        self.link_number = ''
         self.date = ''
 
     def __repr__(self):
         if self.vehicle == 'Presun':
             return u'{0}-> {1}{2}'.format(self.f, self.t, self.walk_duration)
         return u'[{0}]{1} {2} {3} -> {4} {5}{6}'.format(self.vehicle,
-                                                        self.platform,
+                                                        self.link_number,
                                                         self.f,
                                                         self.departure,
                                                         self.t,
                                                         self.arrival,
                                                         self.delay)
+
+    def json(self):
+        if self.vehicle == 'Presun':
+            result = {
+                "from": self.f.strip(),
+                "to": self.t.strip(),
+                "walkDuration": self.walk_duration.strip()
+            }
+
+            return json.dumps(result)
+
+        result = {
+            "vehicle": 'TRAM' if self.vehicle == 'Električka' else 'BUS',
+            "linkNumber": self.link_number.strip(),
+            "from": self.f.strip(),
+            "to": self.t.strip(),
+            "departure": self.departure.strip(),
+            "arrival": self.arrival.strip(),
+            "delay": self.delay.strip()
+        }
+        
+        return json.dumps(result)
 
 
 class Drive(object):
@@ -45,9 +68,16 @@ class Drive(object):
         self.lines = []
 
     def __repr__(self):
-        return '{0} ({1}, {2})'.format(' >> '.join(map(str, self.lines)),
-                                       self.duration,
-                                       self.distance)
+        return '{0} ({1}, {2})'.format(' >> '.join(map(str, self.lines)), self.duration, self.distance)
+
+    def json(self):
+        result = {
+            "lines": map(lambda line: line.json(), self.lines),
+            "duration": self.duration.strip(),
+            "distance": self.distance.strip()
+        }
+
+        return json.dumps(result)
 
 
 def get_routes(departure, dest, vehicle='vlakbus', time='', date=''):
@@ -107,14 +137,11 @@ def get_routes(departure, dest, vehicle='vlakbus', time='', date=''):
                 minstr = 'minutes' if mins is not '1' else 'minute'
 
                 line.delay = ' ({0} {1} delay)'.format(mins, minstr)
+                
+            link_number = table.xpath(trf + '/td[last()]')[0].text_content()
 
-            platform = table.xpath(trf + '/td[6]/span[1]/text()')
-            platform2 = table.xpath(trf + '/td[6]/table/tr[1]/' +
-                                    'td[1]/span[1]/text()')
-            if platform:
-                line.platform = '[{0}]'.format(platform[0])
-            elif platform2:
-                line.platform = '[{0}]'.format(platform2[0])
+            if link_number:
+                line.link_number = link_number
 
             _date = table.xpath(trf + '/td[2]/text()')[0]
             if _date is not ' ':
@@ -123,15 +150,17 @@ def get_routes(departure, dest, vehicle='vlakbus', time='', date=''):
 
             drive.lines.append(line)
 
-        drive.duration = table.xpath('./tr[' + str(datalen) +
-                                     ']/td[3]/p/strong[1]/text()')[0]
+        drive.duration = table.xpath('./tr[' + str(datalen) + ']/td[3]/p/strong[1]/text()')[0]
 
         try:
-            drive.distance = table.xpath('./tr[' + str(datalen) +
-                                         ']/td[3]/p/strong[2]/text()')[0]
-        except IndexError:
-            drive.distance = 'Distance not known'
+            drive.distance = table.xpath('./tr[' + str(datalen) + ']/td[3]/p/strong[2]/text()')[0]
 
-        routes.append(drive)
+            if 'EUR' in drive.distance:
+                drive.distance = ''
+
+        except IndexError:
+            drive.distance = 'Distance unknown'
+
+        routes.append(drive.json())
 
     return routes

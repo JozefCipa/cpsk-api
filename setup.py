@@ -10,10 +10,10 @@ setup(
 
     url='https://github.com/Adman/python-cpsk-api',
 
-    install_requires=['requests', 'lxml'],
+    install_requires=['requests', 'lxml', 'json'],
     include_package_data=True,
     packages=['cpsk'],
 
     license="The MIT License (MIT)",
-    keywords=['travel', 'train', 'bus']
+    keywords=['travel', 'train', 'bus', 'mhd']
 )

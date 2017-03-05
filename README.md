@@ -3,12 +3,13 @@ cpsk-api
 
 Forked from official [repo](https://github.com/Adman/python-cpsk-api)
 
-- In progress
+- Edited xpath to parse link numbers
+- Returning JSON instead of just string results
+- MHD support
 
-Improvements
+TODO improvements
 ------------
  - PHP version, needed for my project
- - parse also link numbers
  - API to get link numbers for given stop
 
 
