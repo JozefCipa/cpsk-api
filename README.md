@@ -1,4 +1,4 @@
-cpsk-api
+python-cpsk-api
 ===============
 
 Forked from official [repo](https://github.com/Adman/python-cpsk-api)
