@@ -9,7 +9,6 @@ Forked from official [repo](https://github.com/Adman/python-cpsk-api)
 
 TODO improvements
 ------------
- - PHP version, needed for my project
  - API to get link numbers for given stop
 
 
